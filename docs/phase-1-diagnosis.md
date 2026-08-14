@@ -4,6 +4,13 @@ Scope: can we programmatically sample citations from Perplexity, Google AI Overv
 ChatGPT often enough, cheaply enough and reliably enough to make a defensible lift claim
 over a 6 week pilot. No application code in this phase.
 
+> **Superseded in part by `phase-1-measurement-design.md`.** That document revises three
+> recommendations here after deeper research into base rates and sampling variance. The
+> access findings below all still stand. The changed positions are: ChatGPT drops to an
+> exploratory surface accessed only via the official OpenAI API (do not build the Bright
+> Data scraper), the three weekly runs become three paraphrase variants rather than three
+> repeats, and sampling should not be raised from 3 to 5. Read both, that one second.
+
 Assumed volume: 80 prompts x 3 surfaces x 3 runs per week x 6 weeks = 1,440 runs per
 surface, 4,320 runs total, roughly 1,040 runs per surface per month. If 80 prompts turns
 out to mean 80 per client rather than 80 across both, double every number below. Nothing
@@ -110,12 +117,20 @@ component we could possibly choose. Not recommended.
 **Option D: drop ChatGPT.** Honest, and worth keeping on the table if Option A proves flaky in
 week 1, but it guts the deliverable since ChatGPT is the surface both clients will ask about first.
 
-**Recommendation: run A and B as two separately labelled surfaces, never merged.**
+**Original recommendation: run A and B as two separately labelled surfaces, never merged.**
 `chatgpt_web` (scraped, high fidelity, expected to fail sometimes) and `chatgpt_api` (official,
-boring, always works). If the scraper dies mid pilot we still have a continuous series from the
-API surface, and the two series can be compared to each other. Combined cost is under $75 for
-the pilot, so running both is cheap insurance. The comparison view must label them distinctly
-and must never sum them into one "ChatGPT" number.
+boring, always works).
+
+> **Revised: build only Option B.** ChatGPT cites YouTube in roughly 3 to 9.5 percent of
+> citations, against 29.5 percent for AI Overviews. For a video pilot at this sample size,
+> ChatGPT cannot support a significance claim no matter how faithfully we scrape it, so the
+> fidelity gained from Option A buys nothing statistically while carrying all of the
+> fragility. Ship `chatgpt_api` only, label it exploratory, and revisit the scraper only if
+> the clients specifically ask for consumer ChatGPT numbers. See
+> `phase-1-measurement-design.md` section 1 for the base rates and the power argument.
+
+If both surfaces are ever built, the comparison view must label them distinctly and must never
+sum them into one "ChatGPT" number.
 
 ---
 
@@ -249,9 +264,12 @@ Pooled at the cohort level (40 treated assets x 18 runs = 720 observations) the 
 fine. Two consequences for Phase 2. First, the comparison view's headline claim must be cohort
 level, with per prompt rows shown as exploratory detail carrying explicit "insufficient sample"
 badges. Second, runs within a prompt are correlated, so naive binomial confidence intervals will
-be too narrow; we need to cluster by prompt or the intervals will overstate our certainty. I
-would also push to raise sampling to 5 runs per prompt per week, since the marginal cost is
-roughly $40 for the whole pilot and it buys nearly 70 percent more observations.
+be too narrow; we need to cluster by prompt or the intervals will overstate our certainty.
+
+> **Revised on the sampling rate.** I initially wanted to raise this to 5 runs per week. The
+> evidence says do not: the marginal repeat past the fifth is worth almost nothing, and
+> paraphrase variants buy far more effective sample for the same money. Keep 3 per week and
+> make them 3 fixed paraphrase variants. See `phase-1-measurement-design.md` section 2.
 
 **2. Silent AI Overview under reporting.** Google lazy loads AI Overviews, serves them on only
 about half of queries, and renders them via JavaScript. Every failure mode here (expired
